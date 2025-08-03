@@ -6,43 +6,24 @@ from PIL import Image, ImageDraw
 import base64
 from io import BytesIO
 
-# Konfigurasi halaman
 st.set_page_config(page_title="Pendaftaran 17 Agustus", layout="centered")
 
 DATA_FILE = "data_peserta.csv"
 FOTO_FOLDER = "foto_peserta"
 KARTU_FOLDER = "kartu_peserta"
-BG_IMAGE = "background17.png    "  # ganti dengan nama file background-mu
 
-# Buat folder jika belum ada
 os.makedirs(FOTO_FOLDER, exist_ok=True)
 os.makedirs(KARTU_FOLDER, exist_ok=True)
 
-# Fungsi set background blur
-def set_background(image_path):
-    with open(image_path, "rb") as image_file:
-        img_bytes = image_file.read()
-    encoded = base64.b64encode(img_bytes).decode()
-    st.markdown(
-        f"""
-        <style>
-        .stApp {{
-            background-image: url("data:image/jpg;base64,{encoded}");
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
-            backdrop-filter: blur(6px);
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-# Terapkan background jika tersedia
-if os.path.exists(BG_IMAGE):
-    set_background(BG_IMAGE)
-else:
-    st.warning(f"Gambar background '{BG_IMAGE}' tidak ditemukan.")
+# Background gradasi merah ke putih
+st.markdown("""
+    <style>
+    .stApp {
+        background: linear-gradient(to bottom, #ff0000, #ffffff);
+        background-attachment: fixed;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 # Fungsi login admin
 def login_admin(username, password):
@@ -88,21 +69,21 @@ def buat_kartu_peserta(data):
     kartu.save(kartu_path)
     return kartu_path
 
-# Tampilkan header dengan logo dan judul
+# Header logo + judul tengah
 with st.container():
     col1, col2 = st.columns([1, 6])
     with col1:
         if os.path.exists("logo.png"):
-            st.image("logo.png", width=100)
+            st.image("logo.png", width=80)
         else:
             st.warning("Logo tidak ditemukan.")
     with col2:
         st.markdown(
-            "<h1 style='color:black; text-align: center;'>PENDAFTARAN 17 AGUSTUS 2025<br>RT.06/02 PINANG 4</h1>",
+            "<h1 style='text-align: center; color: black;'>PENDAFTARAN 17 AGUSTUS 2025<br>RT.06/02 PINANG 4</h1>",
             unsafe_allow_html=True
         )
 
-# Menu utama
+# Menu
 menu = st.sidebar.selectbox("Menu", ["🏠 Daftar Peserta", "🔐 Login Admin"])
 
 if menu == "🏠 Daftar Peserta":
@@ -119,7 +100,7 @@ if menu == "🏠 Daftar Peserta":
     else:
         lomba = st.selectbox("Pilih Lomba", ["Lomba Masak", "Tenis Meja"])
 
-    foto = st.file_uploader("Upload Foto", type=["jpg", "png", "jpeg"])
+    foto = st.file_uploader("Upload Foto", type=["jpg", "jpeg", "png"])
 
     if st.button("Daftar"):
         if nama and tanggal_lahir and foto:
